@@ -3,15 +3,16 @@ import streamlit as st
 import anthropic
 import google.generativeai as genai
 
-# Access API keys from Streamlit Secrets
-c_api_key = st.secrets["claude_api_key"]
-g_api_key = st.secrets["gemini_api_key"]
 
-# Initialize Claude AI client
-claude_client = anthropic.Anthropic(c_api_key=claude_api_key)
+# Retrieve the API key from secrets
+api_key = st.secrets["claude"]["api_key"]
+api_key = st.secrets["gemini"]["api_key"]
+
+# Initialize the client with the API key
+client = anthropic.Anthropic(api_key=api_key)
 
 # Configure Google Gemini API
-genai.configure(g_api_key=gemini_api_key)
+genai.configure(api_key=api_key)
 
 
 
