@@ -2,11 +2,10 @@
 import streamlit as st
 import anthropic
 import google.generativeai as genai
-import os
 
-# Retrieve API keys from environment variables
-claude_api_key = os.getenv("CLAUDE_API_KEY")
-gemini_api_key = os.getenv("GEMINI_API_KEY")
+# Access API keys from Streamlit Secrets
+claude_api_key = st.secrets["claude"]["api_key"]
+gemini_api_key = st.secrets["gemini"]["api_key"]
 
 # Ensure API keys are provided
 if not claude_api_key or not gemini_api_key:
