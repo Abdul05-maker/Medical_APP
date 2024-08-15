@@ -12,41 +12,49 @@ claude_client = anthropic.Anthropic(api_key=claude_api_key)
 # Configure Google Gemini API
 genai.configure(api_key=gemini_api_key)
 
+# Initialize the Gemini model once
+gemini_model = genai.GenerativeModel('gemini-1.5-flash')
+
 def generate_diet_plan(claude_client, fasting_sugar, pre_meal_sugar, post_meal_sugar, preferences):
-    # Claude AI: Generate Meal Plan
-    claude_message = claude_client.messages.create(
-        model="claude-3-5-sonnet-20240620",
-        max_tokens=1000,
-        temperature=0.7,
-        system="You are a world-class nutritionist. Provide a personalized meal plan for a diabetic patient.",
-        messages=[
-            {
-                "role": "user",
-                "content": f"""
-                Create a personalized meal plan for a diabetic patient with the following details:
-                Fasting Sugar Level: {fasting_sugar} mg/dL
-                Pre-Meal Sugar Level: {pre_meal_sugar} mg/dL
-                Post-Meal Sugar Level: {post_meal_sugar} mg/dL
-                Dietary Preferences: {preferences}
-                """
-            }
-        ]
-    )
-    meal_plan = claude_message.content.strip()  # Strip unnecessary spaces/newlines
+    try:
+        # Claude AI: Generate Meal Plan
+        claude_message = claude_client.messages.create(
+            model="claude-3-5-sonnet-20240620",
+            max_tokens=1000,
+            temperature=0.7,
+            system="You are a world-class nutritionist. Provide a personalized meal plan for a diabetic patient.",
+            messages=[
+                {
+                    "role": "user",
+                    "content": f"""
+                    Create a personalized meal plan for a diabetic patient with the following details:
+                    Fasting Sugar Level: {fasting_sugar} mg/dL
+                    Pre-Meal Sugar Level: {pre_meal_sugar} mg/dL
+                    Post-Meal Sugar Level: {post_meal_sugar} mg/dL
+                    Dietary Preferences: {preferences}
+                    """
+                }
+            ]
+        )
+        meal_plan = claude_message.content.strip()  # Strip unnecessary spaces/newlines
 
-    # Google Gemini: Generate Nutritional Information
-    nutritional_info = genai.GenerativeModel('gemini-1.5-flash').generate(
-        prompt=f"Provide detailed nutritional information for the following meal plan:\n{meal_plan}",
-        max_tokens=500
-    ).output.strip()  # Strip unnecessary spaces/newlines
+        # Google Gemini: Generate Nutritional Information
+        nutritional_info = gemini_model.generate(
+            prompt=f"Provide detailed nutritional information for the following meal plan:\n{meal_plan}",
+            max_tokens=500
+        ).output.strip()  # Strip unnecessary spaces/newlines
 
-    # Google Gemini: Generate Expert Insights
-    expert_insights = genai.GenerativeModel('gemini-1.5-flash').generate(
-        prompt=f"Explain how the following meal plan helps in managing diabetes:\n{meal_plan}",
-        max_tokens=500
-    ).output.strip()  # Strip unnecessary spaces/newlines
+        # Google Gemini: Generate Expert Insights
+        expert_insights = gemini_model.generate(
+            prompt=f"Explain how the following meal plan helps in managing diabetes:\n{meal_plan}",
+            max_tokens=500
+        ).output.strip()  # Strip unnecessary spaces/newlines
 
-    return meal_plan, nutritional_info, expert_insights
+        return meal_plan, nutritional_info, expert_insights
+
+    except Exception as e:
+        st.error(f"An error occurred: {e}")
+        return "Error generating meal plan", "Error generating nutritional info", "Error generating expert insights"
 
 # Sidebar Inputs with Enter Buttons
 st.sidebar.header("Input Your Details")
