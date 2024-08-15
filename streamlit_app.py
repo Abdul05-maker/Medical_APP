@@ -1,20 +1,16 @@
-
 import streamlit as st
 import anthropic
 import google.generativeai as genai
 
+# Retrieve the API keys from secrets
+claude_api_key = st.secrets["claude"]["api_key"]
+gemini_api_key = st.secrets["gemini"]["api_key"]
 
-# Retrieve the API key from secrets
-api_key = st.secrets["claude"]["api_key"]
-api_key = st.secrets["gemini"]["api_key"]
-
-# Initialize the client with the API key
-client = anthropic.Anthropic(api_key=api_key)
+# Initialize the Claude client with the API key
+claude_client = anthropic.Anthropic(api_key=claude_api_key)
 
 # Configure Google Gemini API
-genai.configure(api_key=api_key)
-
-
+genai.configure(api_key=gemini_api_key)
 
 def generate_diet_plan(claude_client, fasting_sugar, pre_meal_sugar, post_meal_sugar, preferences):
     # Claude AI: Generate Meal Plan
